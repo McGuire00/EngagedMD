@@ -1,0 +1,8 @@
+create a .env file in the main directory.
+
+INCLUDE THESE THREE VARIABLES:
+
+
+DATABASE_URL=mongodb://localhost/users
+AUTHENTICATION_TOKEN=replace with whatever you want the token to be
+SECRET_SESSION_TOKEN=replace with whatever you want the session token to be
