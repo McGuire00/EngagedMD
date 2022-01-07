@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const session = require("express-session");
 
 const app = express();
 
@@ -21,7 +22,17 @@ mongoose
 app.use(express.json())
 
 // parse form data
-app.use(express.urlencoded({extended: false}))
+// app.use(express.urlencoded({extended: false}))
+
+
+// session to keep track of user
+app.use(
+  session({
+    secret: process.env.AUTHENTICATION_TOKEN,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 // get all account related routes
 app.use('/account/', account)

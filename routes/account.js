@@ -9,7 +9,7 @@ router.get("/login", (req, res) => {
   res.send("This is the login page!");
 });
 
-router.post("/login", async (req, res) => {
+router.post("/authenticate", async (req, res) => {
   const { username, password } = req.body;
 
   const user = await User.findOne({ username });
@@ -17,6 +17,8 @@ router.post("/login", async (req, res) => {
 
   if (match == true) {
     console.log(`User: ${username} has been logged in`);
+    req.session.user = user;
+    console.log(user);
     return res.send(`Logged in with user: ${username}`);
   } else {
     return res.send("Incorrect username or password");
@@ -42,7 +44,7 @@ router.post("/signup", async (req, res) => {
       const user = await User.create({ username, hashedPassword });
       await user.save();
       res.send(`Created account for user: ${username}`);
-      console.log(`User: ${username} created`)
+      console.log(`User: ${username} created`);
     } else {
       res.status(400).send({
         success: false,
@@ -50,6 +52,12 @@ router.post("/signup", async (req, res) => {
       });
     }
   }
+});
+
+router.post("/logout", (req, res) => {
+  req.session.user = null;
+  console.log("Logged out");
+  return res.send("Successfully logged out of account");
 });
 
 module.exports = router;
