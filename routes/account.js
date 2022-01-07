@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const userValidation = require("../util/username-validation");
-const User = require("../models/users")
+const User = require("../models/users");
 
 const router = express.Router();
 
@@ -9,17 +9,15 @@ router.get("/login", (req, res) => {
   res.send("This is the login page!");
 });
 
-router.post("/login",(req, res) => {
-  const { userName, password } = req.body;
+router.post("/login", async (req, res) => {
+  const { username, password } = req.body;
 
-  const user = User.findOne({ userName });
-  const match = bcrypt.compare(password, user.hashedPassword, () => {
-
-  });
+  const user = await User.findOne({ username });
+  const match = await bcrypt.compare(password, user.hashedPassword);
 
   if (match == true) {
-    console.log("logged in!");
-    return res.send(`Logged in with user: ${user}`);
+    console.log(`User: ${username} has been logged in`);
+    return res.send(`Logged in with user: ${username}`);
   } else {
     return res.send("Incorrect username or password");
   }
@@ -32,16 +30,19 @@ router.post("/signup", async (req, res) => {
       - if alphanumeric
 
   */
-  const { userName, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 12)
-  console.log(hashedPassword)
-  if (!userName || !hashedPassword) {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
     res
       .status(404)
       .send({ success: false, msg: "Please check name or password" });
   } else {
-    if (userValidation(userName)) {
-      res.send(`Created account for user: ${userName}`);
+    if (userValidation(username)) {
+      const hashedPassword = await bcrypt.hash(password, 12);
+      const user = await User.create({ username, hashedPassword });
+      await user.save();
+      res.send(`Created account for user: ${username}`);
+      console.log(`User: ${username} created`)
     } else {
       res.status(400).send({
         success: false,
