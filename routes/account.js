@@ -5,9 +5,16 @@ const User = require("../models/users");
 
 const router = express.Router();
 
-router.get("/login", (req, res) => {
-  res.send("This is the login page!");
-});
+
+router.get("/welcome", (req, res) => {
+    sess = req.session
+
+    if(sess.token){
+        res.send(`Hello, ${sess.user.username}`)
+    } else {
+        res.send('Please login first')
+    }
+})
 
 router.post("/authenticate", async (req, res) => {
   const { username, password } = req.body;
@@ -17,9 +24,16 @@ router.post("/authenticate", async (req, res) => {
 
   if (match == true) {
     console.log(`User: ${username} has been logged in`);
+
+    sess = req.session
+    sess.token = process.env.AUTHENTICATION_TOKEN;
+
     req.session.user = user;
-    console.log(user);
-    return res.send(`Logged in with user: ${username}`);
+ 
+    return res.send({
+      success: true,
+      token: process.env.AUTHENTICATION_TOKEN,
+    });
   } else {
     return res.send("Incorrect username or password");
   }

@@ -21,14 +21,11 @@ mongoose
 // parse json
 app.use(express.json())
 
-// parse form data
-// app.use(express.urlencoded({extended: false}))
-
 
 // session to keep track of user
 app.use(
   session({
-    secret: process.env.AUTHENTICATION_TOKEN,
+    secret: process.env.SECRET_SESSION_TOKEN,
     resave: false,
     saveUninitialized: true,
   })
@@ -37,6 +34,7 @@ app.use(
 // get all account related routes
 app.use('/account/', account)
 
+// home page
 app.get("/", (req, res) => {
   res.send("Hello Guest");
 });
